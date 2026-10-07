@@ -1,0 +1,54 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Local environment
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+
+# Human-participant research data: NEVER commit
+data/raw_video/
+data/events/
+data/features/
+data/profiles/
+data/responses/
+data/database/
+data/processed/
+data/processed_final/
+outputs/sessions/
+outputs/audit_runs/
+*.mp4
+*.avi
+*.mov
+*.sqlite
+*.sqlite3
+*consent*
+*identity*
+*participant_link*
+
+# Large/intermediate training artifacts
+outputs/
+!results/
+models/*
+!models/README.md
+!models/binary_5fold_6s/
+!models/binary_5fold_6s/*.pt
+
+# Archives and logs
+*.zip
+*.rar
+*.7z
+*.log
+*.pid
