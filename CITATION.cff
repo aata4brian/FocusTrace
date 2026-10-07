@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use FocusTrace, please cite the accompanying research artifact."
+title: "FocusTrace: Integrasi Analisis Perilaku dan Machine Learning untuk Klasifikasi Perilaku Fokus dalam Pembelajaran"
+type: software
+version: "1.0.0-research"
+date-released: "2026-10-07"
+authors:
+  - family-names: "Baldan"
+    given-names: "Moch. Brian Mursyidan"
+  - family-names: "Mardhita"
+    given-names: "Shabrina Putri"
+repository-code: "https://github.com/aata4brian/FocusTrace"
+institution: "Universitas Airlangga"
