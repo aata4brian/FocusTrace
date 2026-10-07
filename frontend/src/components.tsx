@@ -1,0 +1,32 @@
+import {useEffect,useRef,useState,type ButtonHTMLAttributes,type ReactNode} from 'react';
+import {ArrowDown,ArrowUp,Check,ChevronRight,Radio,WifiOff,X} from 'lucide-react';
+import {api,emit} from './api';
+export const names:Record<string,string>={A1:'DTE · Teks',A2:'DTE · Video',B1:'TREE · Kertas',B2:'TREE · Video eksternal',C1:'TIE · Feed sosial',C2:'TIE · Percakapan'};
+export function Button({variant='primary',children,...props}:ButtonHTMLAttributes<HTMLButtonElement>&{variant?:string}){return <button className={'button '+variant} {...props}>{children}</button>}
+export function StatusBadge({children,tone='slate'}:{children:ReactNode,tone?:string}){return <span className={'badge '+tone}><span className="dot"/>{children}</span>}
+export function ConnectionStatus({online}:{online:boolean}){return <StatusBadge tone={online?'green':'red'}>{online?<Radio size={13}/>:<WifiOff size={13}/>} {online?'Tersinkron':'Menyambung ulang'}</StatusBadge>}
+export const formatTime=(s:number|null|undefined)=>{if(s==null)return '—';const total=Math.ceil(Math.max(0,s));return `${Math.floor(total/60).toString().padStart(2,'0')}:${(total%60).toString().padStart(2,'0')}`};
+export function Timer({remaining,label='WAKTU TERSISA'}:{remaining:number|null,label?:string}){return <div className="timer"><span className="eyebrow">{label}</span><strong>{formatTime(remaining)}</strong><span>Jam resmi dari laptop</span></div>}
+export function ProgressBar({value}:{value:number}){const safe=Math.min(100,Math.max(0,value));return <div className="progress" role="progressbar" aria-valuenow={Math.round(safe)} aria-valuemin={0} aria-valuemax={100}><div style={{width:`${safe}%`}}/></div>}
+export function BlockChip({code}:{code:string}){return <span className={'block-chip '+code[0]}>{code}</span>}
+export function SequenceBuilder({value,onChange,locked=false}:{value:string[],onChange:(v:string[])=>void,locked?:boolean}){
+ function move(i:number,d:number){const copy=[...value];[copy[i],copy[i+d]]=[copy[i+d],copy[i]];onChange(copy)}
+ return <ol className="sequence" aria-label="Urutan enam blok">{value.map((code,i)=><li key={code}><span className="ordinal">{String(i+1).padStart(2,'0')}</span><BlockChip code={code}/><div className="sequence-name">{names[code]}<small>120 detik · dimulai operator</small></div>{!locked&&<div className="move"><button aria-label={`Naikkan ${code}`} disabled={i===0} onClick={()=>move(i,-1)}><ArrowUp size={15}/></button><button aria-label={`Turunkan ${code}`} disabled={i===5} onClick={()=>move(i,1)}><ArrowDown size={15}/></button></div>}{locked&&<ChevronRight size={16}/>}</li>)}</ol>
+}
+export function DeviceStatus({name,ready}:{name:string,ready:boolean}){return <div className="device"><span className={'device-dot '+(ready?'ready':'')}/><div><b>{name}</b><small>{ready?'Terhubung & aktif':'Belum terhubung'}</small></div></div>}
+export function PreFlightCheck({checks}:{checks:any[]}){return <div className="checks">{checks.map(c=><div key={c.name} className={'check '+(c.ok?'ok':'failed')}><span>{c.ok?<Check size={16}/>:<X size={16}/>}</span><div><b>{c.name}</b><small>{c.detail}</small></div></div>)}</div>}
+export function ConfirmDialog({title,children,onConfirm,onCancel}:{title:string,children:ReactNode,onConfirm:()=>void,onCancel:()=>void}){
+ const ref=useRef<HTMLDialogElement>(null);useEffect(()=>{ref.current?.showModal()},[]);
+ return <dialog ref={ref} onCancel={e=>{e.preventDefault();onCancel()}}><div className="dialog"><h2>{title}</h2><p>{children}</p><div className="actions"><Button variant="secondary" onClick={onCancel}>Kembali</Button><Button variant="danger" onClick={onConfirm}>Konfirmasi</Button></div></div></dialog>
+}
+export function Toast({message,onClose}:{message:string,onClose:()=>void}){return message?<div className="toast" role="alert"><span>{message}</span><button aria-label="Tutup pesan" onClick={onClose}><X size={18}/></button></div>:null}
+export function MediaPlayer({src,onError}:{src:string,onError?:(v:string)=>void}){return <div className="media"><video key={src} controls playsInline preload="auto" onPlay={()=>void emit('play',{media:src}).catch(()=>{})} onPause={()=>void emit('pause',{media:src}).catch(()=>{})} onEnded={()=>void emit('ended',{media:src}).catch(()=>{})} onError={()=>{onError?.('Video tidak dapat diputar. Beri tahu peneliti.');void emit('media_error',{media:src}).catch(()=>{})}} src={'/media/'+src}/><small>Tekan putar untuk memulai video.</small></div>}
+export function AnswerField({question,taskToken,initial}:{question:{id:string,text:string},taskToken:string,initial?:{response:string,completed:boolean}}){
+ const [value,setValue]=useState(initial?.response||''),[status,setStatus]=useState(initial?.completed?'Jawaban dikirim':'Belum ada jawaban'),[done,setDone]=useState(Boolean(initial?.completed));
+ const valueRef=useRef(value),version=useRef(0),pending=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),dirty=useRef(false),completedRef=useRef(Boolean(initial?.completed)),queue=useRef(Promise.resolve());
+ function save(text:string,complete=false){const n=++version.current;completedRef.current=complete;dirty.current=false;setStatus('Menyimpan…');
+  queue.current=queue.current.catch(()=>{}).then(async()=>{try{await api('/answer',{task_token:taskToken,question_id:question.id,response:text,completed:complete});if(n===version.current){setStatus(complete?'Jawaban dikirim':'Draf tersimpan');setDone(complete)}}catch(e){dirty.current=true;if(n===version.current)setStatus('Belum tersimpan: '+(e as Error).message)}});return queue.current;
+ }
+ useEffect(()=>()=>{clearTimeout(pending.current);if(dirty.current)void save(valueRef.current,completedRef.current)},[]);
+ return <div className="answer"><label htmlFor={question.id}>{question.text}</label><textarea id={question.id} value={value} rows={5} maxLength={20000} placeholder="Tuliskan jawabanmu di sini…" onChange={e=>{const v=e.target.value;setValue(v);valueRef.current=v;dirty.current=true;completedRef.current=false;setDone(false);setStatus('Perubahan belum tersimpan');clearTimeout(pending.current);pending.current=setTimeout(()=>void save(v),350)}} onBlur={()=>{clearTimeout(pending.current);if(dirty.current)void save(valueRef.current,completedRef.current)}}/><div className="answer-footer"><small role="status">{status}</small><Button variant="secondary" disabled={!value.trim()||done} onClick={()=>{clearTimeout(pending.current);void save(value,true)}}>{done?'Terkirim':'Kirim jawaban'}</Button></div></div>
+}
