@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "seed": 42,
+  "included_ids": ["P01","P02","P03","P04","P05","P06","P07","P09","P10","P11","P12","P13","P14","P15","P016","P018","P19","P20"],
+  "excluded": {
+    "P08": "Incomplete session",
+    "P017": "Replaced before modeling to preserve the planned cohort composition"
+  },
+  "window": {
+    "seconds": 2,
+    "hz": 5,
+    "stride_seconds": 1,
+    "maximum_gap_sec": 0.5,
+    "maximum_age_sec": 0.3,
+    "minimum_valid_fraction": 0.8
+  },
+  "folds": 5,
+  "validation_participants": 3,
+  "rf": {
+    "n_estimators": 160,
+    "max_depth": 12,
+    "min_samples_leaf": 3,
+    "class_weight": "balanced",
+    "n_jobs": 4
+  },
+  "gru": {
+    "hidden": 32,
+    "dropout": 0.2,
+    "epochs": 40,
+    "patience": 6,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "class_weight": true
+  },
+  "tuning": {
+    "maximum_trials_per_fold": 8,
+    "patience": 4,
+    "epochs": 25
+  },
+  "label_policy": "assigned_task_overridden_by_existing_reviews; BLOCK_only; no_claim_of_fully_verified_behavior",
+  "calibration_policy": "pre_block_unlabeled_calibration; first_n_matching_saved_profile; circular_head_center; median_gaze_center",
+  "feature_policy": "yaw_pitch_gaze_21; body unobserved; roll excluded cohort-wide before modeling due to unstable calibration for two participants"
+}
