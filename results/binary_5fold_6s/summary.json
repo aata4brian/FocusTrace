@@ -1,0 +1,46 @@
+{
+  "status": "COMPLETE",
+  "completed_folds": 5,
+  "expected_folds": 5,
+  "updated_at": "2026-10-07T12:21:14.380565+07:00",
+  "fold_metrics": {
+    "macro_f1": {
+      "mean": 0.7469790187163441,
+      "std_sample": 0.047094856531945624
+    },
+    "accuracy": {
+      "mean": 0.7904108247910254
+    }
+  },
+  "pooled_oof": {
+    "0": {
+      "precision": 0.8162186997473007,
+      "recall": 0.8862559241706162,
+      "f1-score": 0.8497966993542215,
+      "support": 8018.0
+    },
+    "1": {
+      "precision": 0.7243880326382592,
+      "recall": 0.5996997748311234,
+      "f1-score": 0.6561730084861758,
+      "support": 3997.0
+    },
+    "accuracy": 0.7909280066583437,
+    "macro avg": {
+      "precision": 0.77030336619278,
+      "recall": 0.7429778495008698,
+      "f1-score": 0.7529848539201986,
+      "support": 12015.0
+    },
+    "weighted avg": {
+      "precision": 0.7856696213923411,
+      "recall": 0.7909280066583437,
+      "f1-score": 0.7853843903738155,
+      "support": 12015.0
+    }
+  },
+  "overfit_warning_folds": [],
+  "suspicious_validation_folds": [],
+  "group_overlap": 0,
+  "limitation": "Exploratory cohort; repeated model-family comparisons require a new participant cohort for confirmation. Fold SD is not a confidence interval. Labels largely reflect assigned tasks."
+}
