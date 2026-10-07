@@ -1,0 +1,22 @@
+seed: 42
+experiment: {calibration_sec: 30, block_sec: 120, dev_calibration_sec: 5, dev_block_sec: 10}
+server: {host: 0.0.0.0, port: 8000, heartbeat_timeout_sec: 12, integrity_disconnect_grace_sec: 15}
+camera: {index: 0, width: 640, height: 480, fps: 20}
+recording: {codec: mp4v, minimum_free_mb: 512, maximum_gap_sec: 1.0}
+content: {require_video_audio: true, minimum_video_sec: 20, c1_min_posts: 12, c1_min_width: 600, c1_min_height: 750, c1_min_image_std: 8.0}
+vision: {feature_hz: 10, min_detection_confidence: 0.5, min_tracking_confidence: 0.5, smoothing_alpha: 0.25}
+gaze: {horizontal_threshold: 0.15, vertical_threshold: 0.22}
+head_pose: {away_yaw_deg: 25, away_pitch_deg: 20}
+body_motion: {variance_samples: 20}
+calibration: {minimum_valid_samples: 50}
+windowing: {seconds: 2, hz: 10, stride_seconds: 1, maximum_gap_sec: 0.5, minimum_valid_fraction: 0.5}
+RF: {n_estimators: 160, max_depth: 12, min_samples_leaf: 3}
+GRU: {hidden: 32, dropout: 0.2, epochs: 40, patience: 6, batch_size: 64, learning_rate: 0.001}
+evaluation:
+  folds: 5
+  training_ids: [P01,P02,P03,P04,P05,P06,P07,P09,P10,P11,P12,P13]
+  validation_ids: [P14,P15,P016]
+  testing_ids: [P018,P19,P20]
+paths: {data: data, outputs: outputs, models: models, content: content}
+privacy: {anonymous_id_pattern: '^[A-Z][A-Z0-9_-]{1,23}$', local_network_only: true}
+inference: {smoothing_alpha: 0.25, onset_threshold: 0.7, recovery_threshold: 0.4, onset_sec: 1.5, recovery_sec: 1.0, minimum_episode_sec: 2.0, merge_gap_sec: 0.5}
